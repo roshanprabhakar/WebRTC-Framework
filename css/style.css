@@ -1,0 +1,37 @@
+body {
+    margin-left: 30%;
+}
+
+#title {
+    font-family: "Arial Black", serif;
+}
+
+#gum-local {
+    /*border: 1px black;*/
+}
+
+#gum-streamed {
+    margin-top: 10px;
+}
+
+.button {
+    padding: 15px;
+    background-color: grey;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    transition: 0.1s;
+}
+
+.button:hover {
+    background-color: white;
+    color: black;
+    border: 1px solid black;
+    transform: scale(0.99);
+}
+
+#showVideo {
+}
+
+#stream-canvas {
+}
