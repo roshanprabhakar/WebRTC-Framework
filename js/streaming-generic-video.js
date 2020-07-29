@@ -1,5 +1,7 @@
 
-const monitors = ['bytesReceived', 'packetsReceived', 'headerBytesReceived', 'packetsLost', 'totalDecodeTime', 'totalInterFrameDelay', 'codecId'];
+// const monitors = ['bytesReceived', 'packetsReceived', 'headerBytesReceived', 'packetsLost', 'totalDecodeTime', 'totalInterFrameDelay', 'codecId'];
+const monitors = ['bytesReceived'];
+let startTime;
 
 //local video component
 let localVideo = document.querySelector("#gum-local");
@@ -10,6 +12,8 @@ let streamedVideo = document.querySelector("#gum-streamed");
 
 let pc1;
 let pc2;
+
+
 
 function getOtherPc(pc) {
     if (pc === pc1) {
@@ -83,7 +87,13 @@ function getConnectionStats() {
             if (report.type === "inbound-rtp" && report.kind === "video") {
                 Object.keys(report).forEach(statName => {
                     if (monitors.includes(statName)) {
-                        statsOutput += `<strong>${statName}:</strong> ${report[statName]}<br>\n`;
+
+                        let bytesIntegral = parseInt(report[statName]);
+                        let timeIntegral = (new Date().getTime() - startTime) / 1000;
+
+                        let bytesPerSecond = bytesIntegral / timeIntegral;
+
+                        statsOutput += `<strong>${statName}:</strong> ${bytesPerSecond} bytes/second <br>\n`;
                     }
                 });
             }
@@ -95,6 +105,9 @@ function getConnectionStats() {
     return 0;
 }
 
+function startTimer() {
+    startTime = new Date().getTime();
+}
 
-initiateVideoFeed().then(initiatePeerConnections).then(connectPeerConnections)
+initiateVideoFeed().then(initiatePeerConnections).then(startTimer).then(connectPeerConnections);
 
