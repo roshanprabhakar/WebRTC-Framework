@@ -56,13 +56,16 @@ function initiatePeerConnections() {
 
 async function connectPeerConnections() {
     try {
+
         let offer = await pc1.createOffer({offerToReceiveVideo: 1, offerToReceiveAudio: 0});
+        offer.sdp = setMediaBitrates(offer.sdp);
 
         await pc2.setRemoteDescription(offer);
 
         await pc1.setLocalDescription(offer);
 
         const answer = await pc2.createAnswer();
+        answer.sdp = setMediaBitrates(answer.sdp);
 
         await pc2.setLocalDescription(answer);
 
@@ -70,6 +73,49 @@ async function connectPeerConnections() {
     } catch (e) {
         console.error("could not establish handshake between peer connections");
     }
+}
+
+// set limit to media bandwidth
+function setMediaBitrates(sdp) {
+    return setMediaBitrate(setMediaBitrate(sdp, "video", 100), "audio", 50);
+}
+
+function setMediaBitrate(sdp, media, bitrate) {
+    var lines = sdp.split("\n");
+    var line = -1;
+    for (var i = 0; i < lines.length; i++) {
+        if (lines[i].indexOf("m="+media) === 0) {
+            line = i;
+            break;
+        }
+    }
+    if (line === -1) {
+        console.debug("Could not find the m line for", media);
+        return sdp;
+    }
+    console.debug("Found the m line for", media, "at line", line);
+
+    // Pass the m line
+    line++;
+
+    // Skip i and c lines
+    while(lines[line].indexOf("i=") === 0 || lines[line].indexOf("c=") === 0) {
+        line++;
+    }
+
+    // If we're on a b line, replace it
+    if (lines[line].indexOf("b") === 0) {
+        console.debug("Replaced b line at line", line);
+        lines[line] = "b=AS:"+bitrate;
+        return lines.join("\n");
+    }
+
+    // Add a new b line
+    console.debug("Adding new b line before line", line);
+    var newLines = lines.slice(0, line);
+    newLines.push("b=AS:"+bitrate);
+    newLines = newLines.concat(lines.slice(line, lines.length));
+    return newLines.join("\n");
 }
 
 function gotRemoteStream(e) {
@@ -87,13 +133,12 @@ function getConnectionStats() {
             if (report.type === "inbound-rtp" && report.kind === "video") {
                 Object.keys(report).forEach(statName => {
                     if (monitors.includes(statName)) {
-
                         let bytesIntegral = parseInt(report[statName]);
                         let timeIntegral = (new Date().getTime() - startTime) / 1000;
 
-                        let bytesPerSecond = bytesIntegral / timeIntegral;
+                        let bytesPerSecond = bytesIntegral / timeIntegral / 1000;
 
-                        statsOutput += `<strong>${statName}:</strong> ${bytesPerSecond} bytes/second <br>\n`;
+                        statsOutput += `<strong>${statName}:</strong> ${bytesPerSecond} kb/s <br>\n`;
                     }
                 });
             }
