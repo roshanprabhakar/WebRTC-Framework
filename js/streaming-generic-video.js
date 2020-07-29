@@ -3,6 +3,8 @@
 const monitors = ['bytesReceived'];
 let startTime;
 
+const bandwidthLimit = 8; //kbits/second
+
 //local video component
 let localVideo = document.querySelector("#gum-local");
 let localStream;
@@ -58,14 +60,14 @@ async function connectPeerConnections() {
     try {
 
         let offer = await pc1.createOffer({offerToReceiveVideo: 1, offerToReceiveAudio: 0});
-        offer.sdp = setMediaBitrates(offer.sdp);
+        offer.sdp = setMediaBitrate(offer.sdp, "video", bandwidthLimit);
 
         await pc2.setRemoteDescription(offer);
 
         await pc1.setLocalDescription(offer);
 
         const answer = await pc2.createAnswer();
-        answer.sdp = setMediaBitrates(answer.sdp);
+        answer.sdp = setMediaBitrate(answer.sdp, "video", bandwidthLimit);
 
         await pc2.setLocalDescription(answer);
 
@@ -75,13 +77,13 @@ async function connectPeerConnections() {
     }
 }
 
-// set limit to media bandwidth
-function setMediaBitrates(sdp) {
-    return setMediaBitrate(setMediaBitrate(sdp, "video", 100), "audio", 50);
-}
-
 function setMediaBitrate(sdp, media, bitrate) {
     var lines = sdp.split("\n");
+    // for (var i = 0; i < lines.length; i++) {
+    //     if (lines[i].indexOf("m=") === 0) {
+    //         console.log(lines[i]);
+    //     }
+    // }
     var line = -1;
     for (var i = 0; i < lines.length; i++) {
         if (lines[i].indexOf("m="+media) === 0) {
@@ -136,9 +138,9 @@ function getConnectionStats() {
                         let bytesIntegral = parseInt(report[statName]);
                         let timeIntegral = (new Date().getTime() - startTime) / 1000;
 
-                        let bytesPerSecond = bytesIntegral / timeIntegral / 1000;
+                        let kbitsPerSecond = bytesIntegral / timeIntegral / 1000;
 
-                        statsOutput += `<strong>${statName}:</strong> ${bytesPerSecond} kb/s <br>\n`;
+                        statsOutput += `<strong>${statName}:</strong> ${kbitsPerSecond * 8} kb/s <br>\n`;
                     }
                 });
             }
