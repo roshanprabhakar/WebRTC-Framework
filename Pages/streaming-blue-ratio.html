@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="../css/style.css">
+    <meta charset="UTF-8">
+    <title>WebRTC Peer2Peer Test</title>
+</head>
+<body>
+
+<div id="container">
+
+    <h1 id="title">Testing WebRTC Function Behaviour</h1>
+
+    <video id="gum-local" autoplay playsinline></video>
+    <p>Displaying information for the getUserMedia() video stream</p>
+
+    <canvas id="canvas-local" style="border: 1px solid; margin-top: 20px;"></canvas>
+    <p>Canvas scrape object for video</p>
+
+    <button id="showVideo" class="button">Open Camera</button>
+    <button id="start" class="button">Start</button>
+    <button id="pause" class="button">Stop</button>
+
+    <!--    <div id="errorMessage"></div>-->
+
+    <!--    <video id="gum-streamed" autoplay playsinline></video>-->
+</div>
+
+<canvas id="stream-canvas" style="border: 1px solid; margin-top: 20px;"></canvas>
+
+<script src="../js/streaming-blue-ratio.js"></script>
+
+</body>
+</html>
