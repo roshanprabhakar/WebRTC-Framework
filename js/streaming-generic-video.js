@@ -3,7 +3,7 @@
 const monitors = ['bytesReceived'];
 let startTime;
 
-const bandwidthLimit = 8; //kbits/second
+const bandwidthLimit = 30; //kbits/second
 
 //local video component
 let localVideo = document.querySelector("#gum-local");
@@ -14,8 +14,6 @@ let streamedVideo = document.querySelector("#gum-streamed");
 
 let pc1;
 let pc2;
-
-
 
 function getOtherPc(pc) {
     if (pc === pc1) {
@@ -49,10 +47,9 @@ function initiatePeerConnections() {
     pc2 = new RTCPeerConnection(SDPSemantics);
     pc2.addEventListener('icecandidate', e => onIceCandidate(pc2, e));
 
-    let statsInterval = window.setInterval(getConnectionStats, 1000);
+    let bitrateInterval = window.setInterval(getConnectionStats, 1000);
 
     pc2.addEventListener('track', gotRemoteStream);
-
     localStream.getVideoTracks().forEach(track => pc1.addTrack(track, localStream));
 }
 
