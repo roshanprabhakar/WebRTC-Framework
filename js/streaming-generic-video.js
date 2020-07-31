@@ -1,9 +1,15 @@
+import 'babel-polyfill';
+
+
+// EDIT THIS VALUE TO TOGGLE BANDWIDTH LIMIT
+// -------------------------------------------
+const bandwidthLimit = 300; //kbits/second
+// -------------------------------------------
+
 
 // const monitors = ['bytesReceived', 'packetsReceived', 'headerBytesReceived', 'packetsLost', 'totalDecodeTime', 'totalInterFrameDelay', 'codecId'];
 const monitors = ['bytesReceived'];
 let startTime;
-
-const bandwidthLimit = 12; //kbits/second
 
 //local video component
 let localVideo = document.querySelector("#gum-local");
@@ -157,7 +163,7 @@ function getConnectionStats() {
 
                         let kbitsPerSecond = bytesIntegral / timeIntegral / 1000;
 
-                        statsOutput += `<strong>${statName}:</strong> ${kbitsPerSecond * 8} kb/s <br>\n`;
+                        statsOutput += `<strong>kilobit rate:</strong> ${kbitsPerSecond * 8} kb/s <br>\n`;
                     }
                 });
             }
@@ -172,6 +178,8 @@ function getConnectionStats() {
 function startTimer() {
     startTime = new Date().getTime();
 }
+
+document.querySelector("#bitratelimit-box").innerHTML = `<strong>bitrate limit:</strong> ${bandwidthLimit} kb/s`;
 
 initiateVideoFeed().then(initiatePeerConnections).then(startTimer).then(connectPeerConnections);
 

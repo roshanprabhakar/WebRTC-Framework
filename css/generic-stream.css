@@ -1,0 +1,27 @@
+body {
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#video-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+video {
+    margin: 10px;
+}
+
+#stats-container p {
+    text-align: center;
+    font-family: Lucida Sans Unicode, sans-serif;
+}
+
+#title {
+    font-family: Lucida Sans Unicode, sans-serif;
+    text-align: center;
+}

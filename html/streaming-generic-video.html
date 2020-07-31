@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <link rel="stylesheet" href="../css/style.css">
+    <!--    <link rel="stylesheet" href="../css/style.css">-->
     <link rel="stylesheet" href="../css/generic-stream.css">
     <meta charset="UTF-8">
     <title>WebRTC Peer2Peer Test</title>
@@ -10,19 +10,19 @@
 
 
 <div id="container">
+    <h1 id="title">Streaming through Conventional Channel</h1>
+    <div id="video-container">
+        <video id="gum-local" autoplay playsinline></video>
+        <!--    <p>Displaying information for the getUserMedia() video stream</p>-->
 
-    <h1 id="title">Testing WebRTC Function Behaviour</h1>
-
-    <p id="bitstream-box"></p>
-    <p id="latency-box"></p>
-
-    <video id="gum-local" autoplay playsinline></video>
-    <p>Displaying information for the getUserMedia() video stream</p>
-
-    <video id="gum-streamed" autoplay playsinline></video>
-    <p>Displaying streamed video data</p>
-
-
+        <video id="gum-streamed" autoplay playsinline></video>
+        <!--    <p>Displaying streamed video data</p>-->
+    </div>
+    <div id="stats-container">
+        <p id="bitstream-box"></p>
+        <p id="latency-box"></p>
+        <p id="bitratelimit-box"><strong>bitrate limit: </strong></p>
+    </div>
 </div>
 
 <script src="../js/streaming-generic-video.js"></script>
