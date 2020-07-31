@@ -3,7 +3,7 @@ import 'babel-polyfill';
 
 // EDIT THIS VALUE TO TOGGLE BANDWIDTH LIMIT
 // -------------------------------------------
-const bandwidthLimit = 300; //kbits/second
+const bandwidthLimit = 12; //kbits/second
 // -------------------------------------------
 
 
