@@ -85,7 +85,7 @@ function getLatency() {
                     let startTime = parseInt(report[statName]);
                     let currentTime = new Date().getTime();
                     // console.log(startTime);
-                    document.querySelector("#latency-box").innerHTML = `${currentTime - startTime} ms`;
+                    document.querySelector("#latency-box").innerHTML = `<strong>transmit latency:</strong> ${currentTime - startTime} ms`;
                 }
             });
 
