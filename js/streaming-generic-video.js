@@ -3,7 +3,7 @@
 const monitors = ['bytesReceived'];
 let startTime;
 
-const bandwidthLimit = 30; //kbits/second
+const bandwidthLimit = 12; //kbits/second
 
 //local video component
 let localVideo = document.querySelector("#gum-local");
@@ -48,6 +48,7 @@ function initiatePeerConnections() {
     pc2.addEventListener('icecandidate', e => onIceCandidate(pc2, e));
 
     let bitrateInterval = window.setInterval(getConnectionStats, 1000);
+    let latencyInterval = window.setInterval(getLatency, 1000);
 
     pc2.addEventListener('track', gotRemoteStream);
     localStream.getVideoTracks().forEach(track => pc1.addTrack(track, localStream));
@@ -72,6 +73,25 @@ async function connectPeerConnections() {
     } catch (e) {
         console.error("could not establish handshake between peer connections");
     }
+}
+
+function getLatency() {
+    pc1.getStats(null).then(stats => {
+        stats.forEach(report => {
+            // console.log("=======================================================");
+
+            Object.keys(report).forEach(statName => {
+                if (statName === "timestamp") {
+                    let startTime = parseInt(report[statName]);
+                    let currentTime = new Date().getTime();
+                    // console.log(startTime);
+                    document.querySelector("#latency-box").innerHTML = `${currentTime - startTime} ms`;
+                }
+            });
+
+            // console.log("=======================================================");
+        });
+    });
 }
 
 function setMediaBitrate(sdp, media, bitrate) {
@@ -143,7 +163,7 @@ function getConnectionStats() {
             }
         });
 
-        document.querySelector("#stats-box").innerHTML = statsOutput;
+        document.querySelector("#bitstream-box").innerHTML = statsOutput;
     });
 
     return 0;
