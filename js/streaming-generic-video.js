@@ -1,15 +1,20 @@
 import 'babel-polyfill';
 
-
-// EDIT THIS VALUE TO TOGGLE BANDWIDTH LIMIT
+// bandwidth limit starts off as unlimited, but can be changed by entering a value in
+// the input box. This updates the session storage value and reloads the page.
 // -------------------------------------------
-const bandwidthLimit = 12; //kbits/second
+var bandwidthLimit = sessionStorage.getItem("bandwidthLimit"); //kbits/second
+if (bandwidthLimit === null) {
+    bandwidthLimit = 'unlimited';
+    // EDIT THIS VALUE TO TOGGLE INITIAL BANDWIDTH LIMIT
+}
 // -------------------------------------------
 
 
 // const monitors = ['bytesReceived', 'packetsReceived', 'headerBytesReceived', 'packetsLost', 'totalDecodeTime', 'totalInterFrameDelay', 'codecId'];
 const monitors = ['bytesReceived'];
-let startTime;
+let previousTime;
+let prevBytesIntegral = 0;
 
 //local video component
 let localVideo = document.querySelector("#gum-local");
@@ -17,6 +22,9 @@ let localStream;
 
 //streamed video component
 let streamedVideo = document.querySelector("#gum-streamed");
+
+const bandwidthButton = document.querySelector('input#bandwidth_button');
+const bandwidthInput = document.querySelector('input#bandwidth_input');
 
 let pc1;
 let pc2;
@@ -54,7 +62,7 @@ function initiatePeerConnections() {
     pc2.addEventListener('icecandidate', e => onIceCandidate(pc2, e));
 
     let bitrateInterval = window.setInterval(getConnectionStats, 1000);
-    let latencyInterval = window.setInterval(getLatency, 1000);
+//    let latencyInterval = window.setInterval(getLatency, 1000);
 
     pc2.addEventListener('track', gotRemoteStream);
     localStream.getVideoTracks().forEach(track => pc1.addTrack(track, localStream));
@@ -62,7 +70,6 @@ function initiatePeerConnections() {
 
 async function connectPeerConnections() {
     try {
-
         let offer = await pc1.createOffer({offerToReceiveVideo: 1, offerToReceiveAudio: 0});
         offer.sdp = setMediaBitrate(offer.sdp, "video", bandwidthLimit);
 
@@ -81,26 +88,30 @@ async function connectPeerConnections() {
     }
 }
 
-function getLatency() {
-    pc1.getStats(null).then(stats => {
-        stats.forEach(report => {
-            // console.log("=======================================================");
-
-            Object.keys(report).forEach(statName => {
-                if (statName === "timestamp") {
-                    let startTime = parseInt(report[statName]);
-                    let currentTime = new Date().getTime();
-                    // console.log(startTime);
-                    document.querySelector("#latency-box").innerHTML = `<strong>transmit latency:</strong> ${currentTime - startTime} ms`;
-                }
-            });
-
-            // console.log("=======================================================");
-        });
-    });
-}
+// function getLatency() {
+//     pc1.getStats(null).then(stats => {
+//         stats.forEach(report => {
+//             // console.log("=======================================================");
+//
+//             Object.keys(report).forEach(statName => {
+//                 if (statName === "timestamp") {
+//                     let startTime = parseInt(report[statName]);
+//                     let currentTime = new Date().getTime();
+//                     // console.log(startTime);
+//                     document.querySelector("#latency-box").innerHTML = `<strong>transmit latency:</strong> ${currentTime - startTime} ms`;
+//                 }
+//             });
+//
+//             // console.log("=======================================================");
+//         });
+//     });
+// }
 
 function setMediaBitrate(sdp, media, bitrate) {
+    if (bandwidthLimit == "unlimited") {
+        return sdp;
+    }
+    bandwidthLimit = parseInt(bandwidthLimit);
     var lines = sdp.split("\n");
     // for (var i = 0; i < lines.length; i++) {
     //     if (lines[i].indexOf("m=") === 0) {
@@ -159,11 +170,13 @@ function getConnectionStats() {
                 Object.keys(report).forEach(statName => {
                     if (monitors.includes(statName)) {
                         let bytesIntegral = parseInt(report[statName]);
-                        let timeIntegral = (new Date().getTime() - startTime) / 1000;
+                        let currentTime = new Date().getTime();
+                        let timeIntegral = (currentTime - previousTime) / 1000;
+                        let kbytesPerSecond = (bytesIntegral-prevBytesIntegral) / timeIntegral / 1000;
+                        prevBytesIntegral = bytesIntegral;
+                        previousTime = currentTime;
 
-                        let kbitsPerSecond = bytesIntegral / timeIntegral / 1000;
-
-                        statsOutput += `<strong>kilobit rate:</strong> ${kbitsPerSecond * 8} kb/s <br>\n`;
+                        statsOutput += `<strong>kilobit rate:</strong> ${(kbytesPerSecond * 8).toFixed(2)} kb/s <br>\n`;
                     }
                 });
             }
@@ -176,10 +189,28 @@ function getConnectionStats() {
 }
 
 function startTimer() {
-    startTime = new Date().getTime();
+    previousTime = new Date().getTime();
 }
+
+// when button clicked set new bandwidthLimit to session storage and reload
+bandwidthButton.onclick = () => {
+  bandwidthLimit = document.getElementById("bandwidth_input").value;
+  sessionStorage.setItem("bandwidthLimit", bandwidthLimit);
+  location.reload();
+};
+
+// Execute a function when the user releases a key on the keyboard
+bandwidthInput.addEventListener("keyup", function(event) {
+  // Number 13 is the "Enter" key on the keyboard
+  if (event.keyCode === 13) {
+    // Cancel the default action, if needed
+    event.preventDefault();
+    // Trigger the button element with a click
+    document.getElementById("bandwidth_button").click();
+  }
+});
+
 
 document.querySelector("#bitratelimit-box").innerHTML = `<strong>bitrate limit:</strong> ${bandwidthLimit} kb/s`;
 
 initiateVideoFeed().then(initiatePeerConnections).then(startTimer).then(connectPeerConnections);
-

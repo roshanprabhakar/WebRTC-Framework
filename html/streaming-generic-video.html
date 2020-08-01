@@ -12,19 +12,32 @@
 <div id="container">
     <h1 id="title">Streaming through Conventional Channel</h1>
     <div id="video-container">
-        <video id="gum-local" autoplay playsinline></video>
+        <video id="gum-local" autoplay playsinline style=" -moz-transform: scaleX(-1);
+        -o-transform: scaleX(-1);
+        -webkit-transform: scaleX(-1);
+        transform: scaleX(-1);
+        "></video>
         <!--    <p>Displaying information for the getUserMedia() video stream</p>-->
 
-        <video id="gum-streamed" autoplay playsinline></video>
+        <video id="gum-streamed" autoplay playsinline style=" -moz-transform: scaleX(-1);
+        -o-transform: scaleX(-1);
+        -webkit-transform: scaleX(-1);
+        transform: scaleX(-1);
+        "></video>
         <!--    <p>Displaying streamed video data</p>-->
     </div>
     <div id="stats-container">
+        <p>
+        <label for="bandwidth_input"><strong>Set max bitrate (kb/s):</strong> (can set to unlimited)</label>
+        <input id="bandwidth_input" type="text" /> <input id="bandwidth_button" type="submit" />
+        </p>
         <p id="bitstream-box"></p>
-        <p id="latency-box"></p>
+        <!--<p id="latency-box"></p>-->
         <p id="bitratelimit-box"><strong>bitrate limit: </strong></p>
     </div>
 </div>
 
+<script src="https://webrtc.github.io/adapter/adapter-latest.js"></script>
 <script src="../js/streaming-generic-video.js"></script>
 
 </body>
