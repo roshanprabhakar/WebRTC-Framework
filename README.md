@@ -17,7 +17,7 @@ Note only the generic stream provides an interface which allows for the throttli
 ## Streaming Full Frames
 
 - Streams uncompressed video data through an RTCDataChannel
-- Each frame is sent as an array of bytes where each byte represents the r, g, b, a value some pixel in the frame, for all pixels in the frame
+- Each frame is sent as an array of bytes where each byte represents the r, g, b, a value of some pixel in the corresponding frame, for all pixels present in the frame
 - An api for splitting these frames and merging them has been implemented and deployed as frames in their uncompressed forms are too large to send in a single transmission
 
 ## Streaming Blue Ratio
