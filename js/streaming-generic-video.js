@@ -1,5 +1,3 @@
-import 'babel-polyfill';
-
 // bandwidth limit starts off as unlimited, but can be changed by entering a value in
 // the input box. This updates the session storage value and reloads the page.
 // -------------------------------------------

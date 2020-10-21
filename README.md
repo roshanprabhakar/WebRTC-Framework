@@ -2,12 +2,6 @@
 
 Each javascript template is linked to an html file. To run a selection, open the html file in your browser.
 
-### Run
-```sh
-open ./html/template -a browser
-```
-Note only the generic stream provides an interface which allows for the throttling of network bandwidth
-
 ## Streaming Generic Video
 
 - Streams video data through a WebRTC configured channel
